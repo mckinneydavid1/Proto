@@ -4,3 +4,9 @@
 //Purpose: Allows a user to create either a business or consumer profile. If business, a
 //user can offer a deal. If consumer, user can utilize a deal made available by a business
 
+int main() {
+    
+    
+    
+    return 0;
+}
