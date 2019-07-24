@@ -25,7 +25,22 @@ public:
         deal.first = name_in;
         deal.second = discount;
     }
-   
+    
+    Deal(Deal &deal) {
+        copy_deal(deal);
+    }
+    
+    Deal& operator=(const Deal &deal_in) {
+        if(this == &deal_in) {
+            return *this;
+        }
+        else {
+            copy_deal(deal_in);
+            return *this;
+        }
+    }
+    
+    
     bool operator<(const Deal &deal1) const {
         return get_name_of_deal() < deal1.get_name_of_deal();
     }
@@ -43,6 +58,17 @@ public:
         return deal;
     }
     
+    void copy_deal(const Deal &deal_in) {
+        deal.first = deal_in.get_name_of_deal();
+        deal.second = deal_in.get_discount();
+    }
+    
+    bool operator==(const Deal &deal_in) {
+        if((get_name_of_deal() == deal_in.get_name_of_deal()) && (get_discount() == deal_in.get_discount()))
+            return true;
+        else
+            return false;
+    }
     
 private:
     std::pair<std::string, int> deal;

@@ -36,7 +36,7 @@ TEST(test_business_get_password) {
 }
 
 TEST(test_business_create_deal) {
-    User *first_user(User_factory("davy", "qwerty", "Business"));
+    User *first_user = User_factory("davy", "qwerty", "Business");
     
     first_user->create_deal();
     

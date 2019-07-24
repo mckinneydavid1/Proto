@@ -57,23 +57,86 @@ class User {
     
 public:
     //EFFECTS returns user's username
-    virtual const std::string & get_username() const = 0;
+    virtual const std::string get_username() const = 0;
     
     //EFFECT return user's password
-    virtual const std::string & get_password() const = 0;
+    virtual const std::string get_password() const = 0;
     
     //EFFECT return valid deals a user has created or redeemeed
     
-    virtual std::map<Deal,int> all_deals() = 0;
+    std::map<Deal,int> all_deals() const;
+    
+    std::map<Deal,int> *all_deals_change();
+    
     
     virtual void create_deal() = 0;
     
-    void add_deal(std::string, int);
+    //void add_deal(std::string, int);
     //virtual void remove_deal(Deal &deal) = 0;
     
     virtual ~User() { };
+    
+    
+    
+private:
+    //std::string username;
+    //std::string password;
+    //std::string profile_type;
+    std::map<Deal, int> my_Deals;
 };
 
+
+
+
+
+// Business class derived from User
+class Business : public User {
+    
+public:
+    Business(std::string username_in, std::string password_in, std::string profile_type_in);
+    
+    const std::string get_username() const;
+    
+    const std::string get_password() const;
+    
+    void create_deal();
+    
+    void add_deal(std::string, int);
+    
+    void remove_deal(Deal &deal);
+    
+    
+    
+private:
+    std::string username;
+    std::string password;
+    std::string profile_type;
+    std::string deal_name;
+    int deal_discount = 0;
+    int barcode = 0;
+    Deal deal;
+    
+};
+
+
+
+// Consumer class derived from User
+class Consumer : public User {
+    
+public:
+    Consumer(std::string username_in, std::string password_in, std::string profile_type_in);
+    
+    const std::string get_username() const;
+    
+    const std::string get_password() const;
+    
+    void create_deal();
+    
+private:
+    std::string username;
+    std::string password;
+    std::string profile_type;
+};
 
 User * User_factory(const std::string &username, const std::string &password,
     const std::string &profile_type);
