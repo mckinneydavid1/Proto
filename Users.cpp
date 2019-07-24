@@ -12,12 +12,17 @@
 #include <map>
 #include <vector>
 #include "user.h"
+//#include "Deal.h"
+#include <cmath>
+#include <sstream>
+
+
 
 
 class Business : public User {
 public:
-    Business(std::string username_in, std::string password_in)
-    : username(username_in), password(password_in) { }
+    Business(std::string username_in, std::string password_in, std::string profile_type_in)
+    : username(username_in), password(password_in), profile_type(profile_type_in) { }
     
     const std::string & get_username() const {
         return username;
@@ -27,39 +32,50 @@ public:
         return password;
     }
     
-    void show_my_deals() {
-        for(auto deals : my_Deals) {
-            std::cout << deals.first << ": " << deals.second << "\n";
-        }
-    }
     
     //EFFECTS user enters the details of the offer they would like to create
     void create_deal() {
+        std::istringstream is;
+        
         std::cout << "Please enter the name of the deal you would like to create: \n";
-        std::cin >> deal_name;
+        getline(std::cin, deal_name);
         std::cout << "\n";
         
-        std::cout << "Please enter the details of the offer: \n";
-        std::cin >> deal_offer;
+        std::cout << "Please enter the percentage discount offered to the customer: \n";
+        std::cin >> deal_discount;
         std::cout << "\n";
+        
+        barcode = rand();
+        
+        add_deal(deal_name, deal_discount);
     }
     
+    
     //EFFECTS adds deal to deals created by user
-    void add_deal(std::string name, std::string offer) {
-        my_Deals.emplace(name, offer);
+    void add_deal(std::string name, int offer) {
+        deal = Deal(deal_name, deal_discount);
+        my_Deals.emplace(deal, barcode);
     }
     
     //EFFECTS removes a deal after it is no longer valid as deemed by user
-    void remove_deal(std::string name) {
-        my_Deals.erase(name);
+    void remove_deal(Deal &deal) {
+        std::map<Deal, int>::iterator it = my_Deals.find(deal);
+        my_Deals.erase(it);
+    }
+    
+    std::map<Deal,int> all_deals()  {
+        return my_Deals;
     }
     
 private:
     std::string username;
     std::string password;
     std::string deal_name;
-    std::string deal_offer;
-    std::map<std::string, std::string> my_Deals;
+    std::string profile_type;
+    int deal_discount = 0;
+    int barcode = 0;
+    Deal deal;
+    std::map<Deal, int> my_Deals;
     
 };
 
@@ -67,8 +83,8 @@ private:
 
 class Consumer : public User {
 public:
-    Consumer(std::string username_in, std::string password_in)
-    : username(username_in), password(password_in) { }
+    Consumer(std::string username_in, std::string password_in, std::string profile_type_in)
+    : username(username_in), password(password_in), profile_type(profile_type_in) { }
     
     const std::string & get_username() const {
         return username;
@@ -78,23 +94,26 @@ public:
         return password;
     }
     
+    std::map<Deal,int> all_deals()  {
+        return my_Deals;
+    }
     
-    void show_my_deals() {
-        for(auto deals : my_Deals) {
-            std::cout << deals.first << ": " << deals.second << "\n";
-        }
+    void create_deal() {
+        ;
     }
     
     //EFFECTS removes a deal after it is no longer valid as deemed by business
-    void remove_deal(std::string name) {
-        my_Deals.erase(name);
+    void remove_deal(Deal &deal) {
+        std::map<Deal, int>::iterator it = my_Deals.find(deal);
+        my_Deals.erase(it);
     }
     
     
 private:
     std::string username;
     std::string password;
-    std::map<std::string, std::string> my_Deals;
+    std::string profile_type;
+    std::map<Deal, int> my_Deals;
     
 };
 
@@ -102,14 +121,21 @@ private:
 User * User_factory(const std::string &username, const std::string &password, const std::string &profile_type) {
     
     if(profile_type == "Business") {
-        return new Business(username, password);
+        return new Business(username, password, profile_type);
     }
     
     if(profile_type == "Consumer") {
-        return new Consumer(username, password);
+        return new Consumer(username, password, profile_type);
     }
     
     assert(false);
     return nullptr;
+}
+
+std::ostream &operator<<(std::ostream & os, const std::map<Deal, int> &all_deals) {
+    for(auto &deals : all_deals) {
+        os << deals.first.get_name_of_deal() << ": " << deals.first.get_discount() << "\n";
+    }
+    return os;
 }
 
