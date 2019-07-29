@@ -12,7 +12,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
-
+#include <fstream>
 
 class Deal {
     
@@ -27,8 +27,10 @@ public:
         deal.second = discount;
     }
     
-    bool operator<(const Deal &deal1) const {
-        return get_name_of_deal() < deal1.get_name_of_deal();
+    //EFFECTS compares deals based on name of deal. Returns true if "this" deal name is
+    // less than rhs deal name
+    bool operator<(const Deal &rhs) const {
+        return get_name_of_deal() < rhs.get_name_of_deal();
     }
     
     
@@ -63,14 +65,24 @@ public:
     virtual const std::string get_password() const = 0;
     
     //EFFECT return valid deals a user has created or redeemeed
-    
     std::map<Deal,int> all_deals() const;
     
+    //MODIFIES deals in a user's map of deals and associated barcodes
+    //EFFECT return valid deals a user has created or redeemed
     std::map<Deal,int> *all_deals_change();
     
-    
+    //MODIFIES user's map of deals and associated barcodes
+    //EFFECT allows user to create a deal via command line input
     virtual void create_deal() = 0;
     
+    //MODIFIES user's map of deals and associated barcodes
+    //EFFECT allows user to create a deal via a file stream
+    virtual void create_deal_with_stream(std::string filename) = 0;
+    
+    //MODIFIES user's map of deals and associated barcodes
+    //EFFECTS allows a consumer to add a single deal to their map of deals from a given
+    //business
+    //virtual void add_single_deal(std::map<Deal, int> deal_and_barcode);
     //void add_deal(std::string, int);
     //virtual void remove_deal(Deal &deal) = 0;
     
@@ -101,8 +113,15 @@ public:
     
     void create_deal();
     
+    void create_deal_with_stream(std::string filename);
+    
+    //EFFECTS adds a deal to a user's map of deals and associated barcodes if it DOES
+    // NOT already exist
     void add_deal(std::string, int);
     
+    
+    //MODIFIES user's map of deals
+    //EFFECTS removes a single element from a user's map of deals and associated barcodes
     void remove_deal(Deal &deal);
     
     
@@ -132,16 +151,47 @@ public:
     
     void create_deal();
     
+    void create_deal_with_stream(std::string filename);
+    
+    //void add_single_deal(std::map<Deal, int> deal_and_barcode);
+    
+    
 private:
     std::string username;
     std::string password;
     std::string profile_type;
 };
 
+
+
+class Game {
+    
+public:
+    
+    Game() {
+        business_users.clear();
+    }
+    
+    //EFFECTS returns all the business in given session
+    std::vector<User*> *get_business_users() {
+        return &business_users;
+    }
+    
+    
+private:
+    
+    std::vector<User*> business_users;
+    
+};
+
+
+
 User * User_factory(const std::string &username, const std::string &password,
     const std::string &profile_type);
 
 
 std::ostream &operator<<(std::ostream & os, const std::map<Deal, int> &all_deals);
+
+std::ostream &operator<<(std::ostream & os, const std::vector<User*> all_businesses);
 
 #endif

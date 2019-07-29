@@ -12,10 +12,10 @@
 #include <map>
 #include <vector>
 #include "user.h"
-//#include "Deal.h"
+#include <ctime>
 #include <cmath>
 #include <sstream>
-
+#include <cstdlib>
 
 // User implementation
 std::map<Deal,int> User::all_deals() const {
@@ -50,14 +50,15 @@ const std::string Business::get_password() const {
 
 
 void Business::create_deal() {
-    std::istringstream is;
-    
+    //srand(unsigned(time(NULL)));
     std::cout << "Please enter the name of the deal you would like to create: \n";
     getline(std::cin, deal_name);
+    //std::cin.ignore();
     std::cout << "\n";
     
     std::cout << "Please enter the percentage discount offered to the customer: \n";
     std::cin >> deal_discount;
+    std::cin.ignore();
     std::cout << "\n";
     
     barcode = rand();
@@ -65,7 +66,28 @@ void Business::create_deal() {
     add_deal(deal_name, deal_discount);
 }
 
-
+void Business::create_deal_with_stream(std::string filename) {
+    //srand(unsigned(time(NULL)));
+    std::ifstream fin;
+    fin.open(filename);
+    std::string trash;
+    //std::string input;
+    
+    //std::istringstream iss(input);
+    
+    while(getline(fin, deal_name)) {
+        //fin >> deal_name;
+        
+        fin >> deal_discount;
+        getline(fin, trash);
+    //iss >> deal_name;
+    //iss >> deal_discount;
+        
+    barcode = rand();
+    add_deal(deal_name, deal_discount);
+        
+    }
+}
 
 
 void Business::add_deal(std::string name, int offer) {
@@ -102,6 +124,20 @@ void Consumer::create_deal() {
     std::cout << "Sorry consumers cannot create deals, only redeem them.\n";
 }
 
+void Consumer::create_deal_with_stream(std::string filename) {
+    std::cout << "Sorry consumers cannot create deals, only redeem them.\n";
+}
+
+/*
+void Consumer::add_single_deal(std::map<Deal, int> deal_and_barcode) {
+    //std::map<Deal, int>::iterator it = all_deals().find(deal);
+    //all_deals_change()->emplace(deal_and_barcode.first, deal_and_barcode.second);
+}
+*/
+
+
+
+
 User * User_factory(const std::string &username, const std::string &password, const std::string &profile_type) {
     
     if(profile_type == "Business") {
@@ -118,12 +154,18 @@ User * User_factory(const std::string &username, const std::string &password, co
 
 std::ostream &operator<<(std::ostream & os, const std::map<Deal, int> &all_deals) {
     for(auto &deals : all_deals) {
-        os << deals.first.get_name_of_deal() << ": " << deals.first.get_discount() << "\n";
+        os << deals.first.get_name_of_deal() << ": " << deals.first.get_discount() << "\n"
+        << "	Barcode: " << deals.second << "\n";
     }
     return os;
 }
 
-
+std::ostream &operator<<(std::ostream & os, const std::vector<User*> all_businesses) {
+    for(auto &business: all_businesses) {
+        os << business->all_deals();
+    }
+    return os;
+}
 
 
 /*
